@@ -39,10 +39,10 @@ app.get('/api', (req, res) => {
     res.send('api is working')
 });
 
-app.use("/api/login", require("./routes/login"));
-app.use("/api/register", require("./routes/register"));
-app.use("/api/friends", require("./routes/friends"));
-app.use("/api/chat", require("./routes/chat"));
+app.use("/api/v1/login", require("./routes/login"));
+app.use("/api/v1/register", require("./routes/register"));
+app.use("/api/v1/friends", require("./routes/friends"));
+app.use("/api/v1/chat", require("./routes/chat"));
 
 // server listening
 server.listen(PORT, () => {

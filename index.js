@@ -17,7 +17,8 @@ const server = http.createServer(app);
 const PORT = process.env.PORT || 4000;
 const allowedOrigins = [
     "http://localhost:3000",
-    "http://192.168.1.109:3000"
+    "http://192.168.1.109:3000",
+    "http://192.168.1.111:3000"
 
 ];
 
@@ -43,6 +44,7 @@ app.use("/api/v1/login", require("./routes/login"));
 app.use("/api/v1/register", require("./routes/register"));
 app.use("/api/v1/friends", require("./routes/friends"));
 app.use("/api/v1/chat", require("./routes/chat"));
+app.use("/api/v1/profile", require("./routes/profile"));
 
 // server listening
 server.listen(PORT, () => {

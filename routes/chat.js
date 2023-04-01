@@ -1,7 +1,55 @@
 const router = require('express').Router();
 const Chat = require('../models/chat_schema');
 const User = require('../models/user_schema');
-const { getAuthUser } = require("../config/authorizer")
+const { getAuthUser } = require("../config/authorizer");
+const { buffToJson, sendToWs } = require('../functions');
+const { joinUser, sendToUser } = require('../websocket/user');
+const { createRoom, joinRoom, sendToRoom } = require('../websocket/room');
+const { Server } = require('ws');
+
+let websocket = null;
+
+const wss = new Server({ noServer: true });
+
+router.get("/ws", (req, res) => {
+    wss.handleUpgrade(req, req.socket, Buffer.alloc(0),
+        (ws) => {
+            // websocket 
+            websocket = ws;
+
+            console.log("New Chat connection");
+            ws.on('message', (message) => {
+                // data to json 
+                const data = buffToJson(message);
+
+                // if error throw invalid json
+                if (data.error) {
+                    return sendToWs(ws, {
+                        error: true,
+                        message: "Invalid JSON"
+                    });
+                }
+
+                // message type 
+                const { type } = data;
+
+                // handle message by switch case
+                switch (type) {
+
+                    // join user
+                    case "join":
+                        console.log("new user " + data._id + " joined");
+                        joinUser(ws, data);
+                        break;
+
+                    default:
+                        break;
+                }
+            });
+        });
+});
+
+
 // get all chats 
 router.get('/:receiver', getAuthUser, async (req, res) => {
     try {
@@ -24,26 +72,45 @@ router.get('/:receiver', getAuthUser, async (req, res) => {
                 select: "-password -otp"
             }
         ]);
+
+
+
         return res.status(200).json(chats);
     } catch (error) {
         return res.status(500).json(error);
     }
 });
 
-// sender: arman
-// rec: rishab
-
-// send: rishab
-// rec: arman
-
-// create new chat
 router.post('/', getAuthUser, async (req, res) => {
     try {
         const user = req.user;
+
+        const { reciever, message } = req.body;
+
         const newChat = new Chat({
             ...req.body,
+            receiver: reciever,
+            message: message,
+            messageType: "text",
+            chat_message_type: "normal",
             sender: user._id
         });
+
+        
+
+        wss.clients.forEach((client) => {
+            if (client.id === reciever) {
+                sendToWs(client, {
+                    sender: user,
+                    reciever: reciever,
+                    message: message,
+                    type: "send-to-user",
+                    messageType: "text",
+                    time: new Date().toISOString()
+                })
+            }
+        })
+
         const savedChat = await newChat.save();
         return res.status(200).json(savedChat);
     } catch (error) {

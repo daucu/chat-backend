@@ -25,11 +25,13 @@ const handleChat = (ws, wss) => {
 
             // join user
             case "join":
+                console.log("new user "+data._id+" joined");
                 joinUser(ws, data);
                 break;
 
             // send to user
             case "send-to-user":
+                console.log("Sneding message to "+ data._id + " from "+ ws.id);
                 sendToUser(ws, data, wss);
                 break;
 

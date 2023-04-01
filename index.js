@@ -11,16 +11,14 @@ const cors = require('cors')
 const app = express();
 const server = http.createServer(app);
 
-// sockets 
-const wss1 = new ws.Server({ 
-    server,
-    path: '/chat'
-});
+
 
 // variables 
 const PORT = process.env.PORT || 4000;
 const allowedOrigins = [
-    "http://localhost:3000"
+    "http://localhost:3000",
+    "http://192.168.1.109:3000"
+
 ];
 
 // middlewares 
@@ -52,9 +50,26 @@ server.listen(PORT, () => {
 });
 
 
-
-// websockets 
+const wss1 = new ws.Server({ noServer: true });
 const { handleChat } = require("./websocket/chats")
-wss1.on('connection', (ws) => handleChat(ws, wss1));
+app.get('/chat', (req, res) => {
+    wss1.handleUpgrade(req, req.socket, Buffer.alloc(0), (ws) => handleChat(ws, wss1));
+});
+
+const wss2 = new ws.Server({ noServer: true });
+const { handleVideo } = require("./websocket/video")
+app.get('/video', (req, res) => {
+    wss2.handleUpgrade(req, req.socket, Buffer.alloc(0), (ws) => handleVideo(ws, wss2));
+});
+
+
+// websockets 1 chats
+// const wss1 = new ws.Server({ noServer: true,path: '/chat'});
+
+// wss1.on('connection', (ws) => handleChat(ws, wss1));
+
+// websockets 2 video
+// const wss2 = new ws.Server({ noServer: true, path: '/video'});
+// wss2.on('connection', (ws) => handleVideo(ws, wss2));
 
 

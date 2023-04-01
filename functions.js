@@ -1,3 +1,5 @@
+const User = require('./models/user_schema');
+
 // buffer to json 
 const buffToJson = (data) => {
     try {
@@ -21,6 +23,15 @@ const stringify = (data) => Buffer.from(JSON.stringify(data)).toString('utf8');
 // message send to server
 const sendToWs = (ws, data) => {
     ws.send(stringify(data));
+}
+
+// get auth user by token 
+
+const getUser = async (token) => {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const { id } = decoded;
+    const userdata = await User.findById(id);
+    return userdata;
 }
 
 

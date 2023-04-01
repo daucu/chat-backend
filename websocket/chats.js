@@ -3,7 +3,7 @@ const { createRoom, joinRoom, sendToRoom } = require('./room');
 const { joinUser, sendToUser } = require("./user");
 
 const handleChat = (ws, wss) => {
-    console.log("New connection");
+    console.log("New Chat connection");
 
     ws.on('message', (message) => {
         // data to json 

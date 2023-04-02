@@ -97,7 +97,7 @@ router.post('/', getAuthUser, async (req, res) => {
                     message: message,
                     type: "send-to-user",
                     messageType: "text",
-                    time: new Date().toISOString(),
+                    createdAt: new Date().toISOString(),
                     seen: false,
                 })
             }

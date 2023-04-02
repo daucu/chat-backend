@@ -36,18 +36,25 @@ const user_sehema = new mongoose.Schema({
   image: {
     type: String,
   },
-  friends: [
-    {
+  friends: [{
+    friend: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
+    lastMessage: {
+      type: String,
+    },
+  }
   ],
   profiletype: {
     type: String,
     default: "normal",
     enum: ["normal", "business", "group", "self"],
   },
-},{
+  lastMessage: {
+    type: String,
+  }
+}, {
   timestamps: true,
 });
 

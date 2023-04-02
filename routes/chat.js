@@ -3,11 +3,10 @@ const Chat = require('../models/chat_schema');
 const User = require('../models/user_schema');
 const { getAuthUser } = require("../config/authorizer");
 const { buffToJson, sendToWs } = require('../functions');
-const { joinUser, sendToUser } = require('../websocket/user');
-const { createRoom, joinRoom, sendToRoom } = require('../websocket/room');
+const { joinUser } = require('../websocket/user');
 const { Server } = require('ws');
 
-let websocket = null;
+var websocket = null;
 
 const wss = new Server({ noServer: true });
 
@@ -87,7 +86,7 @@ router.post('/', getAuthUser, async (req, res) => {
 
         const { reciever, message } = req.body;
 
-       
+
 
         wss.clients.forEach((client) => {
             if (client.id === reciever) {
@@ -113,6 +112,33 @@ router.post('/', getAuthUser, async (req, res) => {
             seen: false,
         });
 
+        await User.findOneAndUpdate({
+            _id: user._id,
+            friends: {
+                $elemMatch: {
+                    friend: reciever,
+                },
+            },
+        },
+            {
+                $set: {
+                    'friends.$.lastMessage': message,
+                },
+            });
+
+        await User.findOneAndUpdate({
+            _id: reciever,
+            friends: {
+                $elemMatch: {
+                    friend: user._id,
+                },
+            },
+        },
+            {
+                $set: {
+                    'friends.$.lastMessage': message,
+                },
+            });
 
         const savedChat = await newChat.save();
         return res.status(200).json(savedChat);

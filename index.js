@@ -18,7 +18,8 @@ const PORT = process.env.PORT || 4000;
 const allowedOrigins = [
     "http://localhost:3000",
     "http://192.168.1.109:3000",
-    "http://192.168.1.111:3000"
+    "http://192.168.1.111:3000",
+    "https://whatsapp-frontend-lake.vercel.app"
 
 ];
 

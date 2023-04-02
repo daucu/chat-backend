@@ -87,16 +87,7 @@ router.post('/', getAuthUser, async (req, res) => {
 
         const { reciever, message } = req.body;
 
-        const newChat = new Chat({
-            ...req.body,
-            receiver: reciever,
-            message: message,
-            messageType: "text",
-            chat_message_type: "normal",
-            sender: user._id
-        });
-
-        
+       
 
         wss.clients.forEach((client) => {
             if (client.id === reciever) {
@@ -106,10 +97,22 @@ router.post('/', getAuthUser, async (req, res) => {
                     message: message,
                     type: "send-to-user",
                     messageType: "text",
-                    time: new Date().toISOString()
+                    time: new Date().toISOString(),
+                    seen: false,
                 })
             }
         })
+
+        const newChat = new Chat({
+            ...req.body,
+            receiver: reciever,
+            message: message,
+            messageType: "text",
+            chat_message_type: "normal",
+            sender: user._id,
+            seen: false,
+        });
+
 
         const savedChat = await newChat.save();
         return res.status(200).json(savedChat);

@@ -46,7 +46,7 @@ const user_sehema = new mongoose.Schema({
     type: String,
     default: "normal",
     enum: ["normal", "business", "group", "self"],
-  }
+  },
 },{
   timestamps: true,
 });

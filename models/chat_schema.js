@@ -53,7 +53,11 @@ const chatSchema = new Schema({
     emoji: {
         type: String,
     },
-
+    seen: {
+        type: Boolean,
+        required: true,
+        default: false,
+    }
 }, {
     timestamps: true,
 });
